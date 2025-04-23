@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Моя гра - Знайди пару</title>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+        }
+        
+        #main-screen, #game-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        #game-container {
+            display: none;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(5, 80px);
+            grid-gap: 5px;
+            margin: 20px auto;
+        }
+        
+        .game-cell {
+            width: 80px;
+            height: 80px;
+            background-color: #ecf0f1;
+            border: 2px solid #bdc3c7;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .game-cell img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .current-image {
+            margin: 20px auto;
+            width: 150px;
+            height: 150px;
+            background-color: #ecf0f1;
+            border: 3px solid #bdc3c7;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .current-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .categories {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .category-btn {
+            margin: 0 10px;
+            padding: 8px 15px;
+            font-size: 16px;
+        }
+        
+        #restart-btn {
+            margin-top: 20px;
+        }
+        
+        .ui-dialog-titlebar-close {
+            display: none;
+        }
+        
+        #success-dialog {
+            display: none;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Головний екран -->
+    <div id="main-screen">
+        <h1>Моя гра "Знайди пару"</h1>
+        <button id="start-btn">Почати гру</button>
+    </div>
+    
+    <!-- Екран гри -->
+    <div id="game-container">
+        <div class="categories">
+            <button class="category-btn" data-category="animals">Тварини</button>
+            <button class="category-btn" data-category="insects">Комахи</button>
+            <button class="category-btn" data-category="fishes">Риби</button>
+        </div>
+        
+        <div class="current-image" id="current-image-container"></div>
+        
+        <div class="game-board" id="game-board"></div>
+        
+        <button id="restart-btn">Почати з початку</button>
+    </div>
+    
+    <!-- Діалогове вікно успіху -->
+    <div id="success-dialog" title="Вітаємо!">
+        <p>Ви успішно завершили гру!</p>
+    </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Бази даних картинок (URL)
+            const imageDatabases = {
+                animals: [
+                    'https://placekitten.com/150/150', 'https://placekitten.com/151/151', 
+                    'https://placekitten.com/152/152', 'https://placekitten.com/153/153',
+                    'https://placekitten.com/154/154', 'https://placekitten.com/155/155',
+                    // Додайте ще 44 URL для тварин (всього 50)
+                    // Для прикладу додамо ще кілька, але в реальній грі потрібно 50
+                    'https://placekitten.com/156/156', 'https://placekitten.com/157/157',
+                    'https://placekitten.com/158/158', 'https://placekitten.com/159/159',
+                    'https://placekitten.com/160/160', 'https://placekitten.com/161/161',
+                    'https://placekitten.com/162/162', 'https://placekitten.com/163/163'
+                ],
+                insects: [
+                    'https://via.placeholder.com/150/FF5733/FFFFFF?text=Insect1',
+                    'https://via.placeholder.com/150/33FF57/FFFFFF?text=Insect2',
+                    'https://via.placeholder.com/150/3357FF/FFFFFF?text=Insect3',
+                    'https://via.placeholder.com/150/FF33A8/FFFFFF?text=Insect4',
+                    // Додайте ще 46 URL для комах (всього 50)
+                    'https://via.placeholder.com/150/FF5733/FFFFFF?text=Insect5',
+                    'https://via.placeholder.com/150/33FF57/FFFFFF?text=Insect6',
+                    'https://via.placeholder.com/150/3357FF/FFFFFF?text=Insect7',
+                    'https://via.placeholder.com/150/FF33A8/FFFFFF?text=Insect8'
+                ],
+                fishes: [
+                    'https://via.placeholder.com/150/00FFFF/000000?text=Fish1',
+                    'https://via.placeholder.com/150/0000FF/FFFFFF?text=Fish2',
+                    'https://via.placeholder.com/150/0080FF/FFFFFF?text=Fish3',
+                    'https://via.placeholder.com/150/00BFFF/FFFFFF?text=Fish4',
+                    // Додайте ще 46 URL для риб (всього 50)
+                    'https://via.placeholder.com/150/00FFFF/000000?text=Fish5',
+                    'https://via.placeholder.com/150/0000FF/FFFFFF?text=Fish6',
+                    'https://via.placeholder.com/150/0080FF/FFFFFF?text=Fish7',
+                    'https://via.placeholder.com/150/00BFFF/FFFFFF?text=Fish8'
+                ]
+            };
+            
+            let currentCategory = 'animals';
+            let currentImages = [];
+            let currentTargetImage = '';
+            let matchedPairs = 0;
+            const totalPairs = 25; // 5x5 grid
+            
+            // Ініціалізація діалогового вікна
+            $("#success-dialog").dialog({
+                autoOpen: false,
+                modal: true,
+                buttons: {
+                    "Грати ще": function() {
+                        $(this).dialog("close");
+                        startGame(currentCategory);
+                    }
+                }
+            });
+            
+            // Обробник кнопки "Почати гру"
+            $("#start-btn").click(function() {
+                $("#main-screen").hide();
+                $("#game-container").show();
+                startGame(currentCategory);
+            });
+            
+            // Обробники кнопок категорій
+            $(".category-btn").click(function() {
+                currentCategory = $(this).data("category");
+                startGame(currentCategory);
+            });
+            
+            // Обробник кнопки "Почати з початку"
+            $("#restart-btn").click(function() {
+startGame(currentCategory);
+            });
+            
+            // Функція початку гри
+            function startGame(category) {
+                // Очищаємо ігрове поле
+                $("#game-board").empty();
+                $("#current-image-container").empty();
+                matchedPairs = 0;
+                
+                // Вибір випадкових картинок для ігрового поля
+                const allImages = [...imageDatabases[category]];
+                currentImages = [];
+                
+                // Вибір 25 унікальних картинок для поля
+                for (let i = 0; i < 25 && allImages.length > 0; i++) {
+                    const randomIndex = Math.floor(Math.random() * allImages.length);
+                    currentImages.push(allImages[randomIndex]);
+                    allImages.splice(randomIndex, 1);
+                }
+                
+                // Створення ігрового поля 5x5
+                for (let i = 0; i < 25; i++) {
+                    const cell = $('<div class="game-cell"></div>');
+                    const img = $('<img>').attr('src', currentImages[i]);
+                    cell.append(img);
+                    cell.data('image-src', currentImages[i]);
+                    $("#game-board").append(cell);
+                }
+                
+                // Вибір поточної цільової картинки
+                selectNewTargetImage();
+                
+                // Налаштування drag-and-drop
+                $("#current-image-container img").draggable({
+                    revert: "invalid",
+                    helper: "clone"
+                });
+                
+                $(".game-cell").droppable({
+                    accept: "#current-image-container img",
+                    drop: function(event, ui) {
+                        const cellImageSrc = $(this).data('image-src');
+                        if (cellImageSrc === currentTargetImage) {
+                            // Правильний збіг
+                            $(this).addClass("ui-state-highlight");
+                            matchedPairs++;
+                            
+                            if (matchedPairs === totalPairs) {
+                                // Гра завершена
+                                $("#success-dialog").dialog("open");
+                            } else {
+                                // Вибрати нову цільову картинку
+                                selectNewTargetImage();
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Функція вибору нової цільової картинки
+            function selectNewTargetImage() {
+                // Вибір випадкової картинки з ігрового поля
+                const randomCellIndex = Math.floor(Math.random() * currentImages.length);
+                currentTargetImage = currentImages[randomCellIndex];
+                
+                // Відображення цільової картинки
+                $("#current-image-container").empty();
+                const targetImg = $('<img>').attr('src', currentTargetImage);
+                $("#current-image-container").append(targetImg);
+                
+                // Оновлення draggable для нової картинки
+                $("#current-image-container img").draggable({
+                    revert: "invalid",
+                    helper: "clone"
+                });
+            }
+        });
+    </script>
+</body>
+</html>
