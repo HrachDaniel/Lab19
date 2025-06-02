@@ -46,11 +46,19 @@
             background-color: #2980b9;
         }
         
+        .game-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 40px;
+            margin: 20px auto;
+        }
+        
         .game-board {
             display: grid;
             grid-template-columns: repeat(5, 80px);
             grid-gap: 5px;
-            margin: 20px auto;
+            margin-left: 25%;
         }
         
         .game-cell {
@@ -72,7 +80,6 @@
         }
         
         .current-image {
-            margin: 20px auto;
             width: 150px;
             height: 150px;
             background-color: #ecf0f1;
@@ -82,6 +89,8 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            margin-right: 25%;
+            margin-top: 140px;
         }
         
         .current-image img {
@@ -131,55 +140,33 @@
             <button class="category-btn" data-category="fishes">Риби</button>
         </div>
         
-        <div class="current-image" id="current-image-container"></div>
-        
-        <div class="game-board" id="game-board"></div>
+        <div class="game-area">
+            <div class="game-board" id="game-board"></div>
+            <div class="current-image" id="current-image-container"></div>
+        </div>
         
         <button id="restart-btn">Почати з початку</button>
-    </div>
+</div>
     
     <!-- Діалогове вікно успіху -->
     <div id="success-dialog" title="Вітаємо!">
         <p>Ви успішно завершили гру!</p>
     </div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <script>
         $(document).ready(function() {
             // Бази даних картинок (URL)
             const imageDatabases = {
                 animals: [
-                    'https://placekitten.com/150/150', 'https://placekitten.com/151/151', 
-                    'https://placekitten.com/152/152', 'https://placekitten.com/153/153',
-                    'https://placekitten.com/154/154', 'https://placekitten.com/155/155',
-                    // Додайте ще 44 URL для тварин (всього 50)
-                    // Для прикладу додамо ще кілька, але в реальній грі потрібно 50
-                    'https://placekitten.com/156/156', 'https://placekitten.com/157/157',
-                    'https://placekitten.com/158/158', 'https://placekitten.com/159/159',
-                    'https://placekitten.com/160/160', 'https://placekitten.com/161/161',
-                    'https://placekitten.com/162/162', 'https://placekitten.com/163/163'
+                    'animals/animal1.jpg', 'animals/animal2.jpg', 'animals/animal3.jpg', 'animals/animal4.jpg'
                 ],
                 insects: [
-                    'https://via.placeholder.com/150/FF5733/FFFFFF?text=Insect1',
-                    'https://via.placeholder.com/150/33FF57/FFFFFF?text=Insect2',
-                    'https://via.placeholder.com/150/3357FF/FFFFFF?text=Insect3',
-                    'https://via.placeholder.com/150/FF33A8/FFFFFF?text=Insect4',
-                    // Додайте ще 46 URL для комах (всього 50)
-                    'https://via.placeholder.com/150/FF5733/FFFFFF?text=Insect5',
-                    'https://via.placeholder.com/150/33FF57/FFFFFF?text=Insect6',
-                    'https://via.placeholder.com/150/3357FF/FFFFFF?text=Insect7',
-                    'https://via.placeholder.com/150/FF33A8/FFFFFF?text=Insect8'
+                    'animals/Insect1.jpg', 'animals/Insect2.jpg', 'animals/Insect3.jpg', 'animals/Insect4.jpg'
                 ],
                 fishes: [
-                    'https://via.placeholder.com/150/00FFFF/000000?text=Fish1',
-                    'https://via.placeholder.com/150/0000FF/FFFFFF?text=Fish2',
-                    'https://via.placeholder.com/150/0080FF/FFFFFF?text=Fish3',
-                    'https://via.placeholder.com/150/00BFFF/FFFFFF?text=Fish4',
-                    // Додайте ще 46 URL для риб (всього 50)
-                    'https://via.placeholder.com/150/00FFFF/000000?text=Fish5',
-                    'https://via.placeholder.com/150/0000FF/FFFFFF?text=Fish6',
-                    'https://via.placeholder.com/150/0080FF/FFFFFF?text=Fish7',
-                    'https://via.placeholder.com/150/00BFFF/FFFFFF?text=Fish8'
+                    'animals/Fish1.jpg', 'animals/Fish2.jpg', 'animals/Fish3.jpg', 'animals/Fish4.jpg'
                 ]
             };
             
@@ -213,10 +200,9 @@
                 currentCategory = $(this).data("category");
                 startGame(currentCategory);
             });
-            
-            // Обробник кнопки "Почати з початку"
+// Обробник кнопки "Почати з початку"
             $("#restart-btn").click(function() {
-startGame(currentCategory);
+                startGame(currentCategory);
             });
             
             // Функція початку гри
