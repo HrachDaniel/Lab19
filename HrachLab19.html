@@ -148,7 +148,6 @@
         <button id="restart-btn">Почати з початку</button>
 </div>
     
-    <!-- Діалогове вікно успіху -->
     <div id="success-dialog" title="Вітаємо!">
         <p>Ви успішно завершили гру!</p>
     </div>
@@ -157,7 +156,6 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <script>
         $(document).ready(function() {
-            // Бази даних картинок (URL)
             const imageDatabases = {
                 animals: [
                     'animals/animal1.jpg', 'animals/animal2.jpg', 'animals/animal3.jpg', 'animals/animal4.jpg'
@@ -174,9 +172,8 @@
             let currentImages = [];
             let currentTargetImage = '';
             let matchedPairs = 0;
-            const totalPairs = 25; // 5x5 grid
+            const totalPairs = 25; 
             
-            // Ініціалізація діалогового вікна
             $("#success-dialog").dialog({
                 autoOpen: false,
                 modal: true,
@@ -188,42 +185,35 @@
                 }
             });
             
-            // Обробник кнопки "Почати гру"
             $("#start-btn").click(function() {
                 $("#main-screen").hide();
                 $("#game-container").show();
                 startGame(currentCategory);
             });
             
-            // Обробники кнопок категорій
             $(".category-btn").click(function() {
                 currentCategory = $(this).data("category");
                 startGame(currentCategory);
             });
-// Обробник кнопки "Почати з початку"
+
             $("#restart-btn").click(function() {
                 startGame(currentCategory);
             });
             
-            // Функція початку гри
             function startGame(category) {
-                // Очищаємо ігрове поле
                 $("#game-board").empty();
                 $("#current-image-container").empty();
                 matchedPairs = 0;
                 
-                // Вибір випадкових картинок для ігрового поля
                 const allImages = [...imageDatabases[category]];
                 currentImages = [];
                 
-                // Вибір 25 унікальних картинок для поля
                 for (let i = 0; i < 25 && allImages.length > 0; i++) {
                     const randomIndex = Math.floor(Math.random() * allImages.length);
                     currentImages.push(allImages[randomIndex]);
                     allImages.splice(randomIndex, 1);
                 }
                 
-                // Створення ігрового поля 5x5
                 for (let i = 0; i < 25; i++) {
                     const cell = $('<div class="game-cell"></div>');
                     const img = $('<img>').attr('src', currentImages[i]);
@@ -232,10 +222,8 @@
                     $("#game-board").append(cell);
                 }
                 
-                // Вибір поточної цільової картинки
                 selectNewTargetImage();
                 
-                // Налаштування drag-and-drop
                 $("#current-image-container img").draggable({
                     revert: "invalid",
                     helper: "clone"
@@ -246,15 +234,12 @@
                     drop: function(event, ui) {
                         const cellImageSrc = $(this).data('image-src');
                         if (cellImageSrc === currentTargetImage) {
-                            // Правильний збіг
                             $(this).addClass("ui-state-highlight");
                             matchedPairs++;
                             
                             if (matchedPairs === totalPairs) {
-                                // Гра завершена
                                 $("#success-dialog").dialog("open");
                             } else {
-                                // Вибрати нову цільову картинку
                                 selectNewTargetImage();
                             }
                         }
@@ -262,18 +247,14 @@
                 });
             }
             
-            // Функція вибору нової цільової картинки
             function selectNewTargetImage() {
-                // Вибір випадкової картинки з ігрового поля
                 const randomCellIndex = Math.floor(Math.random() * currentImages.length);
                 currentTargetImage = currentImages[randomCellIndex];
                 
-                // Відображення цільової картинки
                 $("#current-image-container").empty();
                 const targetImg = $('<img>').attr('src', currentTargetImage);
                 $("#current-image-container").append(targetImg);
                 
-                // Оновлення draggable для нової картинки
                 $("#current-image-container img").draggable({
                     revert: "invalid",
                     helper: "clone"
